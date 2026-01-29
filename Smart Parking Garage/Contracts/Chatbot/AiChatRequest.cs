@@ -9,4 +9,10 @@ public class AiChatRequest
 
     [JsonPropertyName("message")]
     public string Message { get; set; } = string.Empty;
+
+    [JsonPropertyName("latitude")]
+    public double Latitude { get; set; }
+
+    [JsonPropertyName("longitude")]
+    public double Longitude { get; set; }
 }

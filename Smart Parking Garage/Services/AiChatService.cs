@@ -12,12 +12,18 @@ public class AiChatService
         _httpClient = httpClient;
     }
 
-    public async Task<string?> SendAsync(string userId, string message)
+    public async Task<string?> SendAsync(
+        string userId,
+        string message,
+        double latitude,
+        double longitude)
     {
         var request = new AiChatRequest
         {
             UserId = userId,
-            Message = message
+            Message = message,
+            Latitude = latitude,
+            Longitude = longitude
         };
 
         var response = await _httpClient.PostAsJsonAsync(
@@ -25,16 +31,14 @@ public class AiChatService
             request
         );
 
-        var rawResponse = await response.Content.ReadAsStringAsync();
-
-        Console.WriteLine("RAW AI RESPONSE:");
-        Console.WriteLine(rawResponse);
-
         if (!response.IsSuccessStatusCode)
-            throw new Exception("AI ERROR: " + rawResponse);
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            throw new Exception("AI ERROR: " + error);
+        }
 
         var aiResponse =
-            JsonSerializer.Deserialize<AiChatResponse>(rawResponse);
+            await response.Content.ReadFromJsonAsync<AiChatResponse>();
 
         return aiResponse?.Response;
     }
